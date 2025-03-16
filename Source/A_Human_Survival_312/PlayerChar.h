@@ -6,6 +6,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Camera/CameraComponent.h"
+#include "Resource_M.h"
+#include "Kismet/GameplayStatics.h"
 #include "PlayerChar.generated.h"
 
 UCLASS()
@@ -20,6 +22,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 public:	
 	// Called every frame
@@ -45,4 +48,46 @@ public:
 
 	UPROPERTY(VisibleAnywhere) // Unreal Property
 		UCameraComponent* PlayerCamComp; // Player camera. This is where the player sees from.
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats") // Unreal Property
+		float Health = 100.0f; // Player Health stat
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats") // Unreal Property
+		float Stamina = 100.0f; // Player Stamina stat
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats") // Unreal Property
+		float Hunger = 100.0f; // Player Hunger stat
+
+	UPROPERTY(EditAnywhere, Category = "Resources") // Unreal Property
+		int Wood; // Stores player's wood resources
+
+	UPROPERTY(EditAnywhere, Category = "Resources") // Unreal Property
+		int Stone; // Stores player's stone resources
+
+	UPROPERTY(EditAnywhere, Category = "Resources") // Unreal Property
+		int Berry; // Stores player's berry resources
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Resources") // Unreal Property
+		TArray<int> ResourceArray; // Stores total count of player's resources
+
+	UPROPERTY(EditAnywhere, Category = "Resources") // Unreal Property
+		TArray<FString> ResourceNameArray; // Total resources
+
+	UPROPERTY(EditAnywhere, Category = "HitMarker") // Unreal Property
+		UMaterialInterface* hitDecal; // Sets material to use
+
+	UFUNCTION(BlueprintCallable) // Unreal Function
+		void SetHealth(float amount); // Function call to SetHealth
+
+	UFUNCTION(BlueprintCallable) // Unreal Function
+		void SetHunger(float amount); // Function call to SetHunger
+
+	UFUNCTION(BlueprintCallable) // Unreal Function
+		void SetStamina(float amount); // Function call to SetStamina
+
+	UFUNCTION() // Unreal Function
+		void DecreaseStats(); // Function call to DecreaseStats
+
+	UFUNCTION() // Unreal Function
+		void GiveResource(float amount, FString resourceType); // Adds resources to player's inventory via function call to GiveResources
 };
