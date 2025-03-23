@@ -15,19 +15,21 @@ APlayerChar::APlayerChar()
 
 }
 
-// Called when the game starts or when spawned
+// Called when the game starts or when spawned.
 void APlayerChar::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// In-game tick timer
 	FTimerHandle StatsTimerHandle; // Tick timer object
-	GetWorld()->GetTimerManager().SetTimer(StatsTimerHandle, this, & APlayerChar::DecreaseStats, 2.0f, true); // Decreases stat values over time
+	GetWorld()->GetTimerManager().SetTimer(StatsTimerHandle, this, & APlayerChar::DecreaseStats, 2.0f, true); // Decreases stat values over time.
 	
-	ResourceArray.SetNum(3); // Sets number of item types that can be in the player's inventory
-	ResourceNameArray.Add(TEXT("Wood")); // Adds wood as a type of item the player can carry
-	ResourceNameArray.Add(TEXT("Stone")); // Adds stone as a type of item the player can carry
-	ResourceNameArray.Add(TEXT("Berry")); // Adds berries as a type of item the player can carry
+
+	BuildingArray.SetNum(3); // Sets number of building types that can be built by the player.
+	ResourceArray.SetNum(3); // Sets number of item types that can be in the player's inventory.
+	ResourceNameArray.Add(TEXT("Wood")); // Adds wood as a type of item the player can carry.
+	ResourceNameArray.Add(TEXT("Stone")); // Adds stone as a type of item the player can carry.
+	ResourceNameArray.Add(TEXT("Berry")); // Adds berries as a type of item the player can carry.
 }
 
 // Called every frame
@@ -35,9 +37,22 @@ void APlayerChar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (isBuilding) { // Check if the player is trying to build.
+
+		if (spawnedPart) {
+
+			FVector StartLocation = PlayerCamComp->GetComponentLocation();
+			FVector Direction = PlayerCamComp->GetForwardVector() * 400.0f;
+			FVector EndLocation = StartLocation + Direction;
+			spawnedPart->SetActorLocation(EndLocation);
+
+		}
+
+	}
+
 }
 
-// Called to bind functionality to input
+// Called to bind functionality to input.
 void APlayerChar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -57,6 +72,8 @@ void APlayerChar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Interaction input.
 	PlayerInputComponent->BindAction("Interact1", IE_Released, this, &APlayerChar::FindObject);
 
+	// Rotation input.
+	PlayerInputComponent->BindAction("RotateItem", IE_Released, this, &APlayerChar::RotateBuilding);
 }
 
 void APlayerChar::ForwardandBackward(float axisValue) // Function for player to move forward and backward.
@@ -78,69 +95,74 @@ void APlayerChar::StartJump() // Function for player to start jumping.
 
 void APlayerChar::StopJump() // Function for player to stop jumping.
 {
-	bPressedJump = false; // When false, player has stopped jumping. Set to false when player releases jump button
-						  // Will cause player to fall prematurely if not at max altitude
+	bPressedJump = false; // When false, player has stopped jumping. Set to false when player releases jump button.
+						  // Will cause player to fall prematurely if not at max altitude.
 }
 
 void APlayerChar::FindObject() // Function for player object interaction.
 {
 	
-	// Where the player can interact from and how interaction is checked
+	// Where the player can interact from and how interaction is checked.
 	FHitResult HitResult;
 	FVector StartLocation = PlayerCamComp->GetComponentLocation();
 	FVector Direction = PlayerCamComp->GetForwardVector() * 800.0f;
 	FVector EndLocation = StartLocation * Direction;
 
-	// Parameters for what can be interacted with
+	// Parameters for what can be interacted with.
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 	QueryParams.bTraceComplex = true;
 	QueryParams.bReturnFaceIndex = true;
 
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams)) {
+	if (!isBuilding) { // Check if the player is not trying to build.
 
-		AResource_M* HitResource = Cast<AResource_M>(HitResult.GetActor()); // Check which resource type was interacted with
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams)) {
 
-		if (Stamina > 5.0f) {
+			AResource_M* HitResource = Cast<AResource_M>(HitResult.GetActor()); // Check which resource type was interacted with.
 
-			if (HitResource) { // Activates if a resource object was interacted with
+			if (Stamina > 5.0f) {
 
-				FString hitName = HitResource->resourceName; // Resource name to be added
-				int resourceValue = HitResource->resourceAmount; // Resource amount to be added
+				if (HitResource) { // Activates if a resource object was interacted with.
 
-				HitResource->totalResources = HitResource->totalResources - resourceValue;
+					FString hitName = HitResource->resourceName; // Resource name to be added.
+					int resourceValue = HitResource->resourceAmount; // Resource amount to be added.
 
-				if (HitResource->totalResources > resourceValue) {
+					HitResource->totalResources = HitResource->totalResources - resourceValue;
 
-					// Add resource to player's inventory
-					GiveResource(resourceValue, hitName);
+					if (HitResource->totalResources > resourceValue) {
 
-					// Display debug message
-					check(GEngine != nullptr);
-					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Resource Collected"));
+						// Add resource to player's inventory.
+						GiveResource(resourceValue, hitName);
 
-					// Creates a mark where the player interacts
-					UGameplayStatics::SpawnDecalAtLocation(GetWorld(), hitDecal, FVector(10.0f, 10.0f, 10.0f), HitResult.Location, FRotator(-90, 0, 0), 2.0f);
+						// Display debug message.
+						check(GEngine != nullptr);
+						GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Resource Collected"));
 
-					SetStamina(-5.0f); // Stamina decreases when interacting with a resource object
+						// Creates a mark where the player interacts.
+						UGameplayStatics::SpawnDecalAtLocation(GetWorld(), hitDecal, FVector(10.0f, 10.0f, 10.0f), HitResult.Location, FRotator(-90, 0, 0), 2.0f);
 
-				}
-				else {
+						SetStamina(-5.0f); // Stamina decreases when interacting with a resource object.
 
-					// Destroy resource object when depleted
-					HitResource->Destroy();
+					}
+					else {
 
-					// Display debug message
-					check(GEngine != nullptr);
-					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Resource Depleted"));
+						// Destroy resource object when depleted.
+						HitResource->Destroy();
 
+						// Display debug message.
+						check(GEngine != nullptr);
+						GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Resource Depleted"));
+
+					}
 				}
 			}
-
 		}
+	}
 
+	else {
 		
-
+		isBuilding = false;
+	
 	}
 }
 
@@ -197,21 +219,92 @@ void APlayerChar::DecreaseStats()
 void APlayerChar::GiveResource(float amount, FString resourceType)
 {
 
-	if (resourceType == "Wood") { // Checks if acquired resource is wood
+	if (resourceType == "Wood") { // Checks if acquired resource is wood.
 
-		ResourceArray[0] = ResourceArray[0] + amount; // Add wood to current wood amount in player's inventory
-
-	}
-
-	if (resourceType == "Stone") { // Checks if acquired resource is stone
-
-		ResourceArray[1] = ResourceArray[1] + amount; // Add stone to current wood amount in player's inventory
+		ResourceArray[0] = ResourceArray[0] + amount; // Add wood to current wood amount in player's inventory.
 
 	}
 
-	if (resourceType == "Berry") { // Checks if acquired resource is berries
+	if (resourceType == "Stone") { // Checks if acquired resource is stone.
 
-		ResourceArray[2] = ResourceArray[2] + amount; // Add berries to current wood amount in player's inventory
+		ResourceArray[1] = ResourceArray[1] + amount; // Add stone to current wood amount in player's inventory.
 
 	}
+
+	if (resourceType == "Berry") { // Checks if acquired resource is berries.
+
+		ResourceArray[2] = ResourceArray[2] + amount; // Add berries to current wood amount in player's inventory.
+
+	}
+}
+
+void APlayerChar::UpdateResources(float woodAmount, float stoneAmount, FString buildingObject)
+{
+	if (woodAmount <= ResourceArray[0]) {
+
+		if (stoneAmount <= ResourceArray[1]) {
+
+			ResourceArray[0] = ResourceArray[0] - woodAmount;
+			ResourceArray[1] = ResourceArray[1] - stoneAmount;
+
+			if (buildingObject == "Wall") {
+
+				BuildingArray[0] += 1;
+
+			}
+
+			if (buildingObject == "Floor") {
+
+				BuildingArray[1] += 1;
+
+			}
+
+			if (buildingObject == "Ceiling") {
+
+				BuildingArray[2] += 1;
+
+			}
+
+		}
+	}
+}
+
+void APlayerChar::SpawnBuilding(int buildingID, bool& isSuccess)
+{
+	if (!isBuilding) { // Check if player is not building.
+
+		if (BuildingArray[buildingID] >= 1) { // Check if player has building they want to build.
+
+			isBuilding = true; // If so, set building mode equal to true.
+
+			// Where the player wants to place. Building will be at least 400 world units away from the player.
+			FActorSpawnParameters SpawnParam;
+			FVector StartLocation = PlayerCamComp->GetComponentLocation();
+			FVector Direction = PlayerCamComp->GetForwardVector() * 400.0f;
+			FVector EndLocation = StartLocation + Direction;
+			FRotator myRot(0, 0, 0);
+
+			BuildingArray[buildingID] = BuildingArray[buildingID] - 1; // Subtract 1 from the building type the player just placed
+
+			spawnedPart = GetWorld()->SpawnActor<ABuildingPart>(BuildPartClass, EndLocation, myRot, SpawnParam); // Spawn the building the player placed.
+
+			isSuccess = true; // True upon successful place.
+		}
+
+		isSuccess = false; // Return to false after placement is complete so the player can place again.
+
+	}
+
+
+}
+
+void APlayerChar::RotateBuilding()
+{
+
+	if (isBuilding) { // Check if player is in building mode.
+
+		spawnedPart->AddActorWorldRotation(FRotator(0, 90, 0)); // Rotation for object player wants to build.
+
+	}
+
 }
