@@ -24,10 +24,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
-		UStaticMeshComponent* Mesh;
+	UPROPERTY(EditAnywhere) // Unreal Property
+		UStaticMeshComponent* Mesh; // Render the mesh component to the building
 
-	UPROPERTY(EditAnywhere)
-		UArrowComponent* PivotArrow;
+	UPROPERTY(EditAnywhere) // Unreal Property
+		UArrowComponent* PivotArrow; // Creates the arrow used in the editor
 
 };

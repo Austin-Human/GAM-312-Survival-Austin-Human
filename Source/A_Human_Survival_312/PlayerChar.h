@@ -80,14 +80,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Supplies")
 		TArray<int> BuildingArray;
 
-	UPROPERTY()
-		bool isBuilding;
+	UPROPERTY() // Unreal Property
+		bool isBuilding; // Boolean for player building status
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite) // Unreal Property
+		TSubclassOf<ABuildingPart> BuildPartClass; // Used for determining what player wants to build
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		TSubclassOf<ABuildingPart> BuildPartClass;
-
-	UPROPERTY()
-		ABuildingPart* spawnedPart;
+	UPROPERTY() // Unreal Property
+		ABuildingPart* spawnedPart; // Spawns the correct part relative to what the player wants
 
 	UFUNCTION(BlueprintCallable) // Unreal Function
 		void SetHealth(float amount); // Function call to SetHealth
@@ -104,13 +104,13 @@ public:
 	UFUNCTION() // Unreal Function
 		void GiveResource(float amount, FString resourceType); // Adds resources to player's inventory via function call to GiveResources
 
-	UFUNCTION(BlueprintCallable)
-		void UpdateResources(float woodAmount, float stoneAmount, FString buildingObject);
+	UFUNCTION(BlueprintCallable) // Unreal Function
+		void UpdateResources(float woodAmount, float stoneAmount, FString buildingObject); // Function call to update player's current resources
 
-	UFUNCTION(BlueprintCallable)
-		void SpawnBuilding(int buildingID, bool& isSuccess);
+	UFUNCTION(BlueprintCallable) // Unreal Function
+		void SpawnBuilding(int buildingID, bool& isSuccess); // Function call to spawn, or "build", the building that the player wants to build
 
-	UFUNCTION()
-		void RotateBuilding();
+	UFUNCTION() // Unreal Function
+		void RotateBuilding(); // Function call to allow player to rotate what they are building on input
 
 };

@@ -240,28 +240,28 @@ void APlayerChar::GiveResource(float amount, FString resourceType)
 
 void APlayerChar::UpdateResources(float woodAmount, float stoneAmount, FString buildingObject)
 {
-	if (woodAmount <= ResourceArray[0]) {
+	if (woodAmount <= ResourceArray[0]) { // Check if player has enough wood.
 
-		if (stoneAmount <= ResourceArray[1]) {
+		if (stoneAmount <= ResourceArray[1]) { // Check if player has enough stone.
 
-			ResourceArray[0] = ResourceArray[0] - woodAmount;
-			ResourceArray[1] = ResourceArray[1] - stoneAmount;
+			ResourceArray[0] = ResourceArray[0] - woodAmount; // Subtract wood from player's inventory.
+			ResourceArray[1] = ResourceArray[1] - stoneAmount; // Subtract stone from player's inventory.
 
-			if (buildingObject == "Wall") {
+			if (buildingObject == "Wall") { // Check if player built a wall.
 
-				BuildingArray[0] += 1;
-
-			}
-
-			if (buildingObject == "Floor") {
-
-				BuildingArray[1] += 1;
+				BuildingArray[0] += 1; // Add 1 wall to the player's building inventory.
 
 			}
 
-			if (buildingObject == "Ceiling") {
+			if (buildingObject == "Floor") { // Check if player built a floor.
 
-				BuildingArray[2] += 1;
+				BuildingArray[1] += 1; // Add 1 floor to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Ceiling") { // Check if player built a ceiling.
+
+				BuildingArray[2] += 1; // Add 1 ceiling to the player's building inventory.
 
 			}
 
