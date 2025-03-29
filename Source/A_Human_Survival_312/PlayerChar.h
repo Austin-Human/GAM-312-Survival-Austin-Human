@@ -9,6 +9,7 @@
 #include "Resource_M.h"
 #include "Kismet/GameplayStatics.h"
 #include "BuildingPart.h"
+#include "PlayerWidget.h"
 #include "PlayerChar.generated.h"
 
 UCLASS()
@@ -77,8 +78,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "HitMarker") // Unreal Property
 		UMaterialInterface* hitDecal; // Sets material to use
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Supplies")
-		TArray<int> BuildingArray;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Supplies") // Unreal Property
+		TArray<int> BuildingArray; // Array for what the player can build
 
 	UPROPERTY() // Unreal Property
 		bool isBuilding; // Boolean for player building status
@@ -88,6 +89,9 @@ public:
 
 	UPROPERTY() // Unreal Property
 		ABuildingPart* spawnedPart; // Spawns the correct part relative to what the player wants
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) // Unreal Function
+		UPlayerWidget* playerUI; // Set widget to use for player UI
 
 	UFUNCTION(BlueprintCallable) // Unreal Function
 		void SetHealth(float amount); // Function call to SetHealth
