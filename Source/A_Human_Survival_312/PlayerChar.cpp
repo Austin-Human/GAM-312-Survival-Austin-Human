@@ -13,6 +13,12 @@ APlayerChar::APlayerChar()
 	PlayerCamComp->SetupAttachment(GetMesh(), "head"); // Attaches camera to mesh component. In this case, the player's point of view is from the head.
 	PlayerCamComp->bUsePawnControlRotation = true; // Allows camera to rotate with player input.
 
+	BuildingArray.SetNum(3); // Sets number of building types that can be built by the player.
+	ResourceArray.SetNum(3); // Sets number of item types that can be in the player's inventory.
+	ResourceNameArray.Add(TEXT("Wood")); // Adds wood as a type of item the player can carry.
+	ResourceNameArray.Add(TEXT("Stone")); // Adds stone as a type of item the player can carry.
+	ResourceNameArray.Add(TEXT("Berry")); // Adds berries as a type of item the player can carry.
+
 }
 
 // Called when the game starts or when spawned.
@@ -24,12 +30,12 @@ void APlayerChar::BeginPlay()
 	FTimerHandle StatsTimerHandle; // Tick timer object
 	GetWorld()->GetTimerManager().SetTimer(StatsTimerHandle, this, & APlayerChar::DecreaseStats, 2.0f, true); // Decreases stat values over time.
 	
+	if (objWidget) {
 
-	BuildingArray.SetNum(3); // Sets number of building types that can be built by the player.
-	ResourceArray.SetNum(3); // Sets number of item types that can be in the player's inventory.
-	ResourceNameArray.Add(TEXT("Wood")); // Adds wood as a type of item the player can carry.
-	ResourceNameArray.Add(TEXT("Stone")); // Adds stone as a type of item the player can carry.
-	ResourceNameArray.Add(TEXT("Berry")); // Adds berries as a type of item the player can carry.
+		objWidget->UpdateBuildOBJ(0.0f); // Updates the current progress for the building objective.
+		objWidget->UpdateMatOBJ(0.0f); // Updates the current progress for the material collection objective.
+
+	}
 }
 
 // Called every frame
@@ -136,6 +142,12 @@ void APlayerChar::FindObject() // Function for player object interaction.
 						// Add resource to player's inventory.
 						GiveResource(resourceValue, hitName);
 
+						// Add collected resources to objective progress.
+						matsCollected += resourceValue;
+
+						// Update the widget to reflect gained progress.
+						objWidget->UpdateMatOBJ(matsCollected);
+
 						// Display debug message.
 						check(GEngine != nullptr);
 						GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Resource Collected"));
@@ -163,7 +175,10 @@ void APlayerChar::FindObject() // Function for player object interaction.
 
 	else {
 		
-		isBuilding = false;
+		isBuilding = false; // Exit the player from building mode so they can build again.
+		objectsBuilt += 1.0f; // Add 1 to the objects built objective.
+
+		objWidget->UpdateBuildOBJ(objectsBuilt); // Update widget to reflect gained progress.
 	
 	}
 }

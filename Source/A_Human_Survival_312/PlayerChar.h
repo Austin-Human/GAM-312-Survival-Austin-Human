@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "BuildingPart.h"
 #include "PlayerWidget.h"
+#include "ObjectiveWidget.h"
 #include "PlayerChar.generated.h"
 
 UCLASS()
@@ -92,6 +93,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) // Unreal Function
 		UPlayerWidget* playerUI; // Set widget to use for player UI
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) // Unreal Property
+		UObjectiveWidget* objWidget; // Sets the objective widget
+
+	UPROPERTY() // Unreal Property
+		float objectsBuilt; // Float for total objects built
+
+	UPROPERTY() // Unreal Property
+		float matsCollected; // Float for total materials collected
 
 	UFUNCTION(BlueprintCallable) // Unreal Function
 		void SetHealth(float amount); // Function call to SetHealth
