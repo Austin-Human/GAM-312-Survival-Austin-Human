@@ -13,7 +13,7 @@ APlayerChar::APlayerChar()
 	PlayerCamComp->SetupAttachment(GetMesh(), "head"); // Attaches camera to mesh component. In this case, the player's point of view is from the head.
 	PlayerCamComp->bUsePawnControlRotation = true; // Allows camera to rotate with player input.
 
-	BuildingArray.SetNum(3); // Sets number of building types that can be built by the player.
+	BuildingArray.SetNum(11); // Sets number of building types that can be built by the player.
 	ResourceArray.SetNum(3); // Sets number of item types that can be in the player's inventory.
 	ResourceNameArray.Add(TEXT("Wood")); // Adds wood as a type of item the player can carry.
 	ResourceNameArray.Add(TEXT("Stone")); // Adds stone as a type of item the player can carry.
@@ -282,6 +282,53 @@ void APlayerChar::UpdateResources(float woodAmount, float stoneAmount, FString b
 
 			}
 
+			if (buildingObject == "Wall2") { // Check if player built a stone floor.
+
+				BuildingArray[3] += 1; // Add 1 stone floor to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Wall3") { // Check if player built a brick wall.
+
+				BuildingArray[4] += 1; // Add 1 brick wall to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Floor2") { // Check if player built a stone floor.
+
+				BuildingArray[5] += 1; // Add 1 stone floor to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Floor3") { // Check if player built a brick floor.
+
+				BuildingArray[6] += 1; // Add 1 brick floor to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Ceiling2") { // Check if player built a stone ceiling.
+
+				BuildingArray[7] += 1; // Add 1 stone ceiling to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Ceiling3") { // Check if player built a brick ceiling.
+
+				BuildingArray[8] += 1; // Add 1 brick ceiling to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Torch") { // Check if player built a torch.
+
+				BuildingArray[9] += 1; // Add 1 torch to the player's building inventory.
+
+			}
+
+			if (buildingObject == "Door") { // Check if player built a door.
+
+				BuildingArray[10] += 1; // Add 1 door to the player's building inventory.
+
+			}
 		}
 	}
 }

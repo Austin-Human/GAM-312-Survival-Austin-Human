@@ -24,7 +24,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere) // Unreal Property
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) // Unreal Property
 		UStaticMeshComponent* Mesh; // Render the mesh component to the building
 
 	UPROPERTY(EditAnywhere) // Unreal Property
